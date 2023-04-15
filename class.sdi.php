@@ -93,8 +93,6 @@ class SDI{
 
 		$query = "SELECT ".$flds.$join." FROM `$tbl` r $whr $ord $lmt";
 
-		echo $query;
-
 		if(isset($prms['count']) && $prms['count']){
 			return $this->db->query($query)->num_rows;
 		}
