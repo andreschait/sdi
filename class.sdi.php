@@ -77,8 +77,11 @@ class SDI{
 			$whr = 'WHERE ';
 			if(isset($prms['logic'])){
 				for($cc=count($whereItems); $cc>0; $cc--){
-					$prms['logic'] = str_replace($cc,'{{SWITCH-PARAM-'.$cc.'}}',$prms['logic']);
+					$prms['logic'] = str_replace(' '.$cc.' ',' {{SWITCH-PARAM-'.$cc.'}} ',$prms['logic']);
+					$prms['logic'] = str_replace('('.$cc.' ','({{SWITCH-PARAM-'.$cc.'}} ',$prms['logic']);
+					$prms['logic'] = str_replace(' '.$cc.')',' {{SWITCH-PARAM-'.$cc.'}})',$prms['logic']);
 				}
+
 				for($cc=count($whereItems); $cc>0; $cc--){
 					$prms['logic'] = str_replace('{{SWITCH-PARAM-'.$cc.'}}',$whereItems[$cc-1],$prms['logic']);
 				}
@@ -89,6 +92,8 @@ class SDI{
 		}
 
 		$query = "SELECT ".$flds.$join." FROM `$tbl` r $whr $ord $lmt";
+
+		echo $query;
 
 		if(isset($prms['count']) && $prms['count']){
 			return $this->db->query($query)->num_rows;
