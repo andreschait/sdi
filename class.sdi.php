@@ -33,15 +33,15 @@ class SDI{
 		return $this->db->real_escape_string($str);
 	}
 
-	public function query($tbl,$prms=Array(),$queryOne=false){
-		$res = Array();
+	public function query($tbl,$prms=[],$queryOne=false){
+		$res = [];
 		$flds = isset($prms['fields'])?$prms['fields']:'*';
 		$whr = '';
 		$ord = isset($prms['order'])?('ORDER BY `'.array_keys($prms['order'])[0].'` '.end($prms['order'])):'';
 		$lmt = isset($prms['limit'])?'LIMIT '.$prms['limit']:'';
 		$join = isset($prms['join'])?(',(SELECT '.$prms['join']['field'].' FROM '.$prms['join']['table'].' WHERE `'.$prms['join']['outkey'].'`=r.'.$prms['join']['inkey'].')'.(isset($prms['join']['name'])?' AS '.$prms['join']['name']:'')):'';
 
-		$whereItems = Array();
+		$whereItems = [];
 
 		if(isset($prms['where'])){
 			$prms['where'] = array_values($prms['where']);
@@ -54,7 +54,7 @@ class SDI{
 						$whereItem.='`'.$cond['field'].'` ';
 					}
 
-					if(isset($cond['op']) && in_array(strtoupper($cond['op']),Array('IN','LIKE'))){
+					if(isset($cond['op']) && in_array(strtoupper($cond['op']),['IN','LIKE'])){
 						switch(strtoupper($cond['op'])){
 							case 'IN':
 								if(is_array($cond['term'])){
@@ -77,7 +77,7 @@ class SDI{
 			$whr = 'WHERE ';
 			if(isset($prms['logic'])){
 				for($cc=count($whereItems); $cc>0; $cc--){
-					$prms['logic'] = preg_replace('/(?<!-|\d)'.$cc.'/','{{SWITCH-PARAM-'.$cc.'}}',$prms['logic']);
+					$prms['logic'] = str_replace($cc,'{{SWITCH-PARAM-'.$cc.'}}',$prms['logic']);
 				}
 				for($cc=count($whereItems); $cc>0; $cc--){
 					$prms['logic'] = str_replace('{{SWITCH-PARAM-'.$cc.'}}',$whereItems[$cc-1],$prms['logic']);
@@ -99,7 +99,7 @@ class SDI{
 			$res[] = $queryRow;
 		}
 
-		return $res?($queryOne?$res[0]:$res):Array();
+		return $res?($queryOne?$res[0]:$res):[];
 	}
 
 	public function insert($tbl,$payload){
@@ -114,7 +114,7 @@ class SDI{
 		return $query?$this->db->insert_id:false;
 	}
 
-	public function upsert($tbl,$payload,$key=Array()){
+	public function upsert($tbl,$payload,$key=[]){
 		$exists = $this->db->query("SELECT * FROM $tbl WHERE `".array_keys($key)[0]."`='".end($key)."'")->num_rows;
 
 		if($exists){
@@ -124,8 +124,8 @@ class SDI{
 		}
 	}
 
-	public function update($tbl,$payload,$key=Array()){
-		$updateQuery = Array();
+	public function update($tbl,$payload,$key=[]){
+		$updateQuery = [];
 
 		foreach($payload as $k=>$v){
 			$updateQuery[] = "`$k`=".(is_null($v)?'NULL':"'".$this->escape($v)."'");
@@ -139,7 +139,7 @@ class SDI{
 		return $query;
 	}
 
-	public function delete($tbl,$where=Array()){
+	public function delete($tbl,$where=[]){
 		$whr = '';
 
 		if($where){
